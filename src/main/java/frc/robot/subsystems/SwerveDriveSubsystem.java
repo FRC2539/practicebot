@@ -143,7 +143,7 @@ public class SwerveDriveSubsystem extends NetworkTablesSubsystem implements Upda
     }
 
     public void resetGyroAngle() {
-        resetGyroAngle(new Rotation2d());
+        resetGyroAngle(Rotation2d.fromDegrees(180));
     }
 
     private void updateOdometry() {
