@@ -3,7 +3,6 @@ package frc.robot;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.commands.*;
 import frc.robot.common.controller.Axis;
-// import frc.robot.common.controller.ThrustmasterJoystick;
 import frc.robot.common.controller.LogitechController;
 import frc.robot.subsystems.*;
 

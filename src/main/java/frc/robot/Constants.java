@@ -22,8 +22,6 @@ public class Constants {
     public static final double DRIVETRAIN_BACK_RIGHT_ENCODER_OFFSET = Math.toRadians(-128.759);
 
     public static final int DRIVE_CONTROLLER = 0;
-    // public static final int RIGHT_DRIVE_CONTROLLER = 1;
-    // public static final int OPERATOR_CONTROLLER = 2;
 
     public static final double ROBOT_PERIODIC_ALLOCATION = 0.002;
 	public static final double CONTROLLER_PERIOD = 0.005;
