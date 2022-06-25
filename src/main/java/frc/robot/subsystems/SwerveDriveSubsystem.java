@@ -244,7 +244,7 @@ public class SwerveDriveSubsystem extends NetworkTablesSubsystem implements Upda
                 current += module.getDriveTemperature() + ",";
                 current += module.getSteerTemperature() + ",";
             }
-            current = current.substring(0, current.length() - 1) + "\n";
+            current = current.substring(0, current.length() - 1) + ";";
             temperaturesLogEntry.setString(current);
         }
     }
