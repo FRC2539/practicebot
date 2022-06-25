@@ -236,5 +236,10 @@ public final class Falcon500SteerControllerFactoryBuilder {
 
             return motorAngleRadians;
         }
+
+        @Override
+        public Double getMotorTemperature() {
+            return motor.getTemperature();
+        }
     }
 }

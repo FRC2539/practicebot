@@ -95,5 +95,10 @@ public final class NeoDriveControllerFactoryBuilder {
         public void resetEncoder() 
         {            
         }
+
+        @Override
+        public Double getMotorTemperature() {
+            return motor.getMotorTemperature();
+        }
     }
 }

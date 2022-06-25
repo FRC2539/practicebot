@@ -45,7 +45,14 @@ public class SwerveModuleFactory<DriveConfiguration, SteerConfiguration> {
             this.driveController = driveController;
             this.steerController = steerController;
         }
+        
+        public Double getDriveTemperature() {
+            return driveController.getMotorTemperature();
+        }
 
+        public Double getSteerTemperature() {
+            return steerController.getMotorTemperature();
+        }
 
         @Override
         public Double getDriveMotor() {

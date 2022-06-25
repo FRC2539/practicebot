@@ -179,5 +179,10 @@ public final class NeoSteerControllerFactoryBuilder {
 
             return motorAngleRadians;
         }
+
+        @Override
+        public Double getMotorTemperature() {
+            return motor.getMotorTemperature();
+        }
     }
 }

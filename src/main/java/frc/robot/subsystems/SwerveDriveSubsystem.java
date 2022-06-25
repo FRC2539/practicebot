@@ -27,6 +27,8 @@ public class SwerveDriveSubsystem extends NetworkTablesSubsystem implements Upda
 
     public static final double MAX_VOLTAGE = 12.0;
 
+    public static final double TEMPERATURE_LOG_PERIOD = 1;
+
     private final SwerveDriveKinematics swerveKinematics = new SwerveDriveKinematics(
         new Translation2d(TRACKWIDTH / 2.0, WHEELBASE / 2.0), // Front left
         new Translation2d(TRACKWIDTH / 2.0, -WHEELBASE / 2.0), // Front right
@@ -56,6 +58,13 @@ public class SwerveDriveSubsystem extends NetworkTablesSubsystem implements Upda
     private NetworkTableEntry odometryAngleEntry;
 
     private NetworkTableEntry navXAngleEntry;
+
+    private NetworkTableEntry driveTemperaturesEntry;
+    private NetworkTableEntry steerTemperaturesEntry;
+
+    private NetworkTableEntry temperaturesLogEntry;
+
+    private Timer temperaturesLogTimer = new Timer();
 
     public SwerveDriveSubsystem() {
         super("Swerve Drive");
@@ -102,6 +111,14 @@ public class SwerveDriveSubsystem extends NetworkTablesSubsystem implements Upda
         odometryAngleEntry = getEntry("Angle");
 
         navXAngleEntry = getEntry("NavX Angle");
+
+        driveTemperaturesEntry = getEntry("Drive Temperatures");
+        steerTemperaturesEntry = getEntry("Steer Temperatures");
+
+        temperaturesLogEntry = getEntry("Temperatures Log");
+        temperaturesLogEntry.setString("time,drive 0,steer 0,drive 1,steer 1,drive 2,steer 2,drive 3,steer 3\n");
+
+        temperaturesLogTimer.start();
     }
 
     public Pose2d getPose() {
@@ -205,5 +222,30 @@ public class SwerveDriveSubsystem extends NetworkTablesSubsystem implements Upda
         odometryAngleEntry.setDouble(pose.getRotation().getDegrees());
 
         navXAngleEntry.setDouble(getGyroRotation2d().getDegrees());
+
+        driveTemperaturesEntry.setDoubleArray(new double[] {
+            modules[0].getDriveTemperature(),
+            modules[1].getDriveTemperature(),
+            modules[2].getDriveTemperature(),
+            modules[3].getDriveTemperature()
+        });
+
+        steerTemperaturesEntry.setDoubleArray(new double[] {
+            modules[0].getSteerTemperature(),
+            modules[1].getSteerTemperature(),
+            modules[2].getSteerTemperature(),
+            modules[3].getSteerTemperature()
+        });
+
+        if (temperaturesLogTimer.advanceIfElapsed(TEMPERATURE_LOG_PERIOD)) {
+            String current = temperaturesLogEntry.getString("time,drive 0,steer 0,drive 1,steer 1,drive 2,steer 2,drive 3,steer 3\n");
+            current += Timer.getFPGATimestamp() + ",";
+            for (SwerveModule module : modules) {
+                current += module.getDriveTemperature() + ",";
+                current += module.getSteerTemperature() + ",";
+            }
+            current = current.substring(0, current.length() - 1) + "\n";
+            temperaturesLogEntry.setString(current);
+        }
     }
 }
