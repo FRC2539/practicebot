@@ -3,6 +3,7 @@ package frc.robot.common.controller;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj2.command.button.Button;
 
 public abstract class Axis implements DoubleSupplier {
@@ -10,6 +11,7 @@ public abstract class Axis implements DoubleSupplier {
 
 	private boolean inverted = false;
 	private double scale = 1.0;
+	private SlewRateLimiter rateLimiter = new SlewRateLimiter(5, 0);
 
 	public boolean isInverted() {
 		return inverted;
@@ -27,6 +29,10 @@ public abstract class Axis implements DoubleSupplier {
 		this.scale = scale;
 	}
 
+	public void setRateLimit(double rateLimit) {
+		rateLimiter = new SlewRateLimiter(rateLimit, 0);
+	}
+
 	public abstract double getRaw();
 
 	public double get() {
@@ -40,6 +46,18 @@ public abstract class Axis implements DoubleSupplier {
 	@Override
 	public double getAsDouble() {
 		return get(true);
+	}
+
+	public double getLimited(boolean squared, boolean ignoreScale) {
+		return rateLimiter.calculate(get(squared, ignoreScale));
+	}
+
+	public double getLimited(boolean squared) {
+		return getLimited(squared, false);
+	}
+
+	public double getLimited() {
+		return getLimited(false, false);
 	}
 
 	public double get(boolean squared, boolean ignoreScale) {

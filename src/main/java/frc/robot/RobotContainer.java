@@ -20,10 +20,13 @@ public class RobotContainer {
     }
 
     private void configureControllerLayout() {
-        driveController.getLeftXAxis().setScale(SwerveDriveSubsystem.MAX_VELOCITY * 0.75);
+        driveController.getLeftXAxis().setScale(SwerveDriveSubsystem.MAX_VELOCITY);
         driveController.getLeftXAxis().setInverted(true);
-        driveController.getLeftYAxis().setScale(SwerveDriveSubsystem.MAX_VELOCITY * 0.75);
-        driveController.getRightXAxis().setScale(SwerveDriveSubsystem.MAX_ANGULAR_VELOCITY * 0.75);
+        driveController.getLeftYAxis().setScale(SwerveDriveSubsystem.MAX_VELOCITY);
+        driveController.getRightXAxis().setScale(SwerveDriveSubsystem.MAX_ANGULAR_VELOCITY);
+        driveController.getLeftXAxis().setRateLimit(SwerveDriveSubsystem.MAX_VELOCITY * 2.5);
+        driveController.getLeftYAxis().setRateLimit(SwerveDriveSubsystem.MAX_VELOCITY * 2.5);
+        driveController.getRightXAxis().setRateLimit(SwerveDriveSubsystem.MAX_ANGULAR_VELOCITY * 2.5);
 
         driveController.getBack().whenPressed(() -> drivetrainSubsystem.resetGyroAngle());
     }

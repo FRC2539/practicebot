@@ -25,9 +25,9 @@ public class DriveCommand extends CommandBase {
     public void execute() {
         drivetrainSubsystem.drive(
             new ChassisSpeeds(
-                forward.get(true), 
-                strafe.get(true), 
-                rotation.get(true)
+                forward.getLimited(true), 
+                strafe.getLimited(true), 
+                rotation.getLimited(true)
             ), 
             true
         );
