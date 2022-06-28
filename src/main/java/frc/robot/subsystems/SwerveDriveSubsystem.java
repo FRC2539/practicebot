@@ -1,9 +1,9 @@
 package frc.robot.subsystems;
 
-import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
-import com.swervedrivespecialties.swervelib.SwerveModule;
-import com.swervedrivespecialties.swervelib.Mk3ModuleConfiguration;
-import com.swervedrivespecialties.swervelib.Mk3SwerveModuleHelper;
+import com.team2539.cougarswervelib.SwerveModule;
+import com.team2539.cougarswervelib.SdsModuleConfigurations;
+import com.team2539.cougarswervelib.Mk3ModuleConfiguration;
+import com.team2539.cougarswervelib.Mk3SwerveModuleHelper;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
