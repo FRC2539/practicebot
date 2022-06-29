@@ -1,10 +1,10 @@
 package frc.robot.subsystems;
 
-import com.team2539.cougarswervelib.SwerveModule;
-import com.team2539.cougarswervelib.SdsModuleConfigurations;
+import com.kauailabs.navx.frc.AHRS;
 import com.team2539.cougarswervelib.Mk3ModuleConfiguration;
 import com.team2539.cougarswervelib.Mk3SwerveModuleHelper;
-
+import com.team2539.cougarswervelib.SdsModuleConfigurations;
+import com.team2539.cougarswervelib.SwerveModule;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -14,10 +14,10 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.Timer;
-
-import com.kauailabs.navx.frc.AHRS;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.common.control.SwerveDriveSignal;
+import frc.robot.util.FieldGraphics;
 import frc.robot.util.Updatable;
 
 public class SwerveDriveSubsystem extends NetworkTablesSubsystem implements Updatable {
@@ -30,28 +30,32 @@ public class SwerveDriveSubsystem extends NetworkTablesSubsystem implements Upda
     public static final double TEMPERATURE_LOG_PERIOD = 1;
 
     private final SwerveDriveKinematics swerveKinematics = new SwerveDriveKinematics(
-        new Translation2d(TRACKWIDTH / 2.0, WHEELBASE / 2.0), // Front left
-        new Translation2d(TRACKWIDTH / 2.0, -WHEELBASE / 2.0), // Front right
-        new Translation2d(-TRACKWIDTH / 2.0, WHEELBASE / 2.0), // Back left
-        new Translation2d(-TRACKWIDTH / 2.0, -WHEELBASE / 2.0) // Back right
-    );
+            new Translation2d(TRACKWIDTH / 2.0, WHEELBASE / 2.0), // Front left
+            new Translation2d(TRACKWIDTH / 2.0, -WHEELBASE / 2.0), // Front right
+            new Translation2d(-TRACKWIDTH / 2.0, WHEELBASE / 2.0), // Back left
+            new Translation2d(-TRACKWIDTH / 2.0, -WHEELBASE / 2.0) // Back right
+            );
 
-    public static final double MAX_VELOCITY = 6380.0 / 60 * 
-        SdsModuleConfigurations.MK3_FAST.getDriveReduction() * 
-        SdsModuleConfigurations.MK3_FAST.getWheelDiameter() * Math.PI;
+    public static final double MAX_VELOCITY = 6380.0
+            / 60
+            * SdsModuleConfigurations.MK3_FAST.getDriveReduction()
+            * SdsModuleConfigurations.MK3_FAST.getWheelDiameter()
+            * Math.PI;
 
-    public static final double MAX_ANGULAR_VELOCITY = MAX_VELOCITY /
-        Math.hypot(TRACKWIDTH / 2.0, WHEELBASE / 2.0);
+    public static final double MAX_ANGULAR_VELOCITY = MAX_VELOCITY / Math.hypot(TRACKWIDTH / 2.0, WHEELBASE / 2.0);
 
     private SwerveModule[] modules;
 
     private final AHRS gyroscope = new AHRS();
 
-    private final SwerveDriveOdometry swerveOdometry = new SwerveDriveOdometry(swerveKinematics, new Rotation2d(), new Pose2d());
+    private final SwerveDriveOdometry swerveOdometry =
+            new SwerveDriveOdometry(swerveKinematics, new Rotation2d(), new Pose2d());
 
     private Pose2d pose = new Pose2d();
     private ChassisSpeeds velocity = new ChassisSpeeds();
     private SwerveDriveSignal driveSignal = null;
+
+    private FieldGraphics dashboardField2d = new FieldGraphics();
 
     private NetworkTableEntry odometryXEntry;
     private NetworkTableEntry odometryYEntry;
@@ -74,37 +78,33 @@ public class SwerveDriveSubsystem extends NetworkTablesSubsystem implements Upda
         invertedConfiguration.setDriveInverted(true);
 
         SwerveModule frontLeftModule = Mk3SwerveModuleHelper.createFalcon500(
-            Mk3SwerveModuleHelper.GearRatio.FAST,
-            Constants.DRIVETRAIN_FRONT_LEFT_DRIVE_MOTOR,
-            Constants.DRIVETRAIN_FRONT_LEFT_TURN_MOTOR,
-            Constants.DRIVETRAIN_FRONT_LEFT_ENCODER_PORT,
-            Constants.DRIVETRAIN_FRONT_LEFT_ENCODER_OFFSET
-        );
+                Mk3SwerveModuleHelper.GearRatio.FAST,
+                Constants.DRIVETRAIN_FRONT_LEFT_DRIVE_MOTOR,
+                Constants.DRIVETRAIN_FRONT_LEFT_TURN_MOTOR,
+                Constants.DRIVETRAIN_FRONT_LEFT_ENCODER_PORT,
+                Constants.DRIVETRAIN_FRONT_LEFT_ENCODER_OFFSET);
         SwerveModule frontRightModule = Mk3SwerveModuleHelper.createFalcon500(
-            invertedConfiguration,
-            Mk3SwerveModuleHelper.GearRatio.FAST,
-            Constants.DRIVETRAIN_FRONT_RIGHT_DRIVE_MOTOR,
-            Constants.DRIVETRAIN_FRONT_RIGHT_TURN_MOTOR,
-            Constants.DRIVETRAIN_FRONT_RIGHT_ENCODER_PORT,
-            Constants.DRIVETRAIN_FRONT_RIGHT_ENCODER_OFFSET
-        );
+                invertedConfiguration,
+                Mk3SwerveModuleHelper.GearRatio.FAST,
+                Constants.DRIVETRAIN_FRONT_RIGHT_DRIVE_MOTOR,
+                Constants.DRIVETRAIN_FRONT_RIGHT_TURN_MOTOR,
+                Constants.DRIVETRAIN_FRONT_RIGHT_ENCODER_PORT,
+                Constants.DRIVETRAIN_FRONT_RIGHT_ENCODER_OFFSET);
         SwerveModule backLeftModule = Mk3SwerveModuleHelper.createFalcon500(
-            Mk3SwerveModuleHelper.GearRatio.FAST,
-            Constants.DRIVETRAIN_BACK_LEFT_DRIVE_MOTOR,
-            Constants.DRIVETRAIN_BACK_LEFT_TURN_MOTOR,
-            Constants.DRIVETRAIN_BACK_LEFT_ENCODER_PORT,
-            Constants.DRIVETRAIN_BACK_LEFT_ENCODER_OFFSET
-        );
+                Mk3SwerveModuleHelper.GearRatio.FAST,
+                Constants.DRIVETRAIN_BACK_LEFT_DRIVE_MOTOR,
+                Constants.DRIVETRAIN_BACK_LEFT_TURN_MOTOR,
+                Constants.DRIVETRAIN_BACK_LEFT_ENCODER_PORT,
+                Constants.DRIVETRAIN_BACK_LEFT_ENCODER_OFFSET);
         SwerveModule backRightModule = Mk3SwerveModuleHelper.createFalcon500(
-            invertedConfiguration,
-            Mk3SwerveModuleHelper.GearRatio.FAST,
-            Constants.DRIVETRAIN_BACK_RIGHT_DRIVE_MOTOR,
-            Constants.DRIVETRAIN_BACK_RIGHT_TURN_MOTOR,
-            Constants.DRIVETRAIN_BACK_RIGHT_ENCODER_PORT,
-            Constants.DRIVETRAIN_BACK_RIGHT_ENCODER_OFFSET
-        );
+                invertedConfiguration,
+                Mk3SwerveModuleHelper.GearRatio.FAST,
+                Constants.DRIVETRAIN_BACK_RIGHT_DRIVE_MOTOR,
+                Constants.DRIVETRAIN_BACK_RIGHT_TURN_MOTOR,
+                Constants.DRIVETRAIN_BACK_RIGHT_ENCODER_PORT,
+                Constants.DRIVETRAIN_BACK_RIGHT_ENCODER_OFFSET);
 
-        modules = new SwerveModule[]{frontLeftModule, frontRightModule, backLeftModule, backRightModule};
+        modules = new SwerveModule[] {frontLeftModule, frontRightModule, backLeftModule, backRightModule};
 
         odometryXEntry = getEntry("X");
         odometryYEntry = getEntry("Y");
@@ -119,6 +119,8 @@ public class SwerveDriveSubsystem extends NetworkTablesSubsystem implements Upda
         temperaturesLogEntry.setString("time,drive 0,steer 0,drive 1,steer 1,drive 2,steer 2,drive 3,steer 3\n");
 
         temperaturesLogTimer.start();
+
+        SmartDashboard.putData("Field", dashboardField2d);
     }
 
     public Pose2d getPose() {
@@ -168,7 +170,7 @@ public class SwerveDriveSubsystem extends NetworkTablesSubsystem implements Upda
 
         for (int i = 0; i < modules.length; i++) {
             var module = modules[i];
-    
+
             moduleStates[i] = new SwerveModuleState(module.getDriveVelocity(), new Rotation2d(module.getSteerAngle()));
         }
 
@@ -181,12 +183,19 @@ public class SwerveDriveSubsystem extends NetworkTablesSubsystem implements Upda
         if (driveSignal == null) {
             chassisVelocity = new ChassisSpeeds();
         } else if (driveSignal.isFieldOriented()) {
-            chassisVelocity = ChassisSpeeds.fromFieldRelativeSpeeds(driveSignal.vxMetersPerSecond, driveSignal.vyMetersPerSecond, driveSignal.omegaRadiansPerSecond, getGyroRotation2d());
+            chassisVelocity = ChassisSpeeds.fromFieldRelativeSpeeds(
+                    driveSignal.vxMetersPerSecond,
+                    driveSignal.vyMetersPerSecond,
+                    driveSignal.omegaRadiansPerSecond,
+                    getGyroRotation2d());
         } else {
-            chassisVelocity = new ChassisSpeeds(driveSignal.vxMetersPerSecond, driveSignal.vyMetersPerSecond, driveSignal.omegaRadiansPerSecond);
+            chassisVelocity = new ChassisSpeeds(
+                    driveSignal.vxMetersPerSecond, driveSignal.vyMetersPerSecond, driveSignal.omegaRadiansPerSecond);
         }
 
-        if(chassisVelocity.vxMetersPerSecond == 0 && chassisVelocity.vyMetersPerSecond == 0 && chassisVelocity.omegaRadiansPerSecond == 0) {
+        if (chassisVelocity.vxMetersPerSecond == 0
+                && chassisVelocity.vyMetersPerSecond == 0
+                && chassisVelocity.omegaRadiansPerSecond == 0) {
             stopModules();
             return;
         }
@@ -195,7 +204,9 @@ public class SwerveDriveSubsystem extends NetworkTablesSubsystem implements Upda
         SwerveDriveKinematics.desaturateWheelSpeeds(moduleStates, MAX_VELOCITY);
         for (int i = 0; i < moduleStates.length; i++) {
             var module = modules[i];
-            module.set(moduleStates[i].speedMetersPerSecond / MAX_VELOCITY * MAX_VOLTAGE, moduleStates[i].angle.getRadians());
+            module.set(
+                    moduleStates[i].speedMetersPerSecond / MAX_VELOCITY * MAX_VOLTAGE,
+                    moduleStates[i].angle.getRadians());
         }
     }
 
@@ -238,7 +249,8 @@ public class SwerveDriveSubsystem extends NetworkTablesSubsystem implements Upda
         });
 
         if (temperaturesLogTimer.advanceIfElapsed(TEMPERATURE_LOG_PERIOD)) {
-            String current = temperaturesLogEntry.getString("time,drive 0,steer 0,drive 1,steer 1,drive 2,steer 2,drive 3,steer 3\n");
+            String current = temperaturesLogEntry.getString(
+                    "time,drive 0,steer 0,drive 1,steer 1,drive 2,steer 2,drive 3,steer 3\n");
             current += Timer.getFPGATimestamp() + ",";
             for (SwerveModule module : modules) {
                 current += module.getDriveTemperature() + ",";
@@ -247,5 +259,13 @@ public class SwerveDriveSubsystem extends NetworkTablesSubsystem implements Upda
             current = current.substring(0, current.length() - 1) + ";";
             temperaturesLogEntry.setString(current);
         }
+
+        dashboardField2d.setRobotPose(swerveOdometry.getPoseMeters());
+
+        dashboardField2d.drawCircle(
+                "goal",
+                1,
+                FieldGraphics.FIELD_WIDTH / 2 + Math.cos(Timer.getFPGATimestamp()),
+                FieldGraphics.FIELD_HEIGHT / 2 + Math.sin(Timer.getFPGATimestamp()));
     }
 }

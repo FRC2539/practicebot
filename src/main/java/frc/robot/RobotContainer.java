@@ -8,13 +8,20 @@ import frc.robot.subsystems.*;
 
 public class RobotContainer {
     private final LogitechController driveController = new LogitechController(Constants.DRIVE_CONTROLLER);
-    
+
     private final SwerveDriveSubsystem drivetrainSubsystem = new SwerveDriveSubsystem();
 
     public RobotContainer() {
         CommandScheduler.getInstance().registerSubsystem(drivetrainSubsystem);
-        
-        CommandScheduler.getInstance().setDefaultCommand(drivetrainSubsystem, new DriveCommand(drivetrainSubsystem, getDriveForwardAxis(), getDriveStrafeAxis(), getDriveRotationAxis()));
+
+        CommandScheduler.getInstance()
+                .setDefaultCommand(
+                        drivetrainSubsystem,
+                        new DriveCommand(
+                                drivetrainSubsystem,
+                                getDriveForwardAxis(),
+                                getDriveStrafeAxis(),
+                                getDriveRotationAxis()));
 
         configureControllerLayout();
     }
